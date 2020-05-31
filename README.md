@@ -1,5 +1,5 @@
 # few-shots-generation
-Few shots image generation based 
+Few shots image generation based on SinGAN model
 
 ## Code
 
