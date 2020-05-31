@@ -1,5 +1,6 @@
 # few-shots-generation
 Few shots image generation based on SinGAN model
+[view_random_samples.png]
 
 ## Code
 
