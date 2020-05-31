@@ -1,5 +1,6 @@
 # few-shots-generation
 Few shots image generation based on SinGAN model (See SinGAN Repository: https://github.com/tamarott/SinGAN)
+
 ![scale=0.7](figures/flowers_random_samples.png)
 
 
