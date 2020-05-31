@@ -17,11 +17,6 @@ from sklearn.cluster import KMeans
 
 
 # custom weights initialization called on netG and netD
-
-# def read_image(opt):
-#     x = img.imread('%s%s' % (opt.input_img,opt.ref_image))
-#     return np2torch(x)
-
 def denorm(x):
     out = (x + 1) / 2
     return out.clamp(0, 1)
@@ -29,15 +24,6 @@ def denorm(x):
 def norm(x):
     out = (x -0.5) *2
     return out.clamp(-1, 1)
-
-#def denorm2image(I1,I2):
-#    out = (I1-I1.mean())/(I1.max()-I1.min())
-#    out = out*(I2.max()-I2.min())+I2.mean()
-#    return out#.clamp(I2.min(), I2.max())
-
-#def norm2image(I1,I2):
-#    out = (I1-I2.mean())*2
-#    return out#.clamp(I2.min(), I2.max())
 
 def convert_image_np(inp):
     if inp.shape[1]==3:
@@ -48,8 +34,6 @@ def convert_image_np(inp):
         inp = denorm(inp)
         inp = move_to_cpu(inp[-1,-1,:,:])
         inp = inp.numpy().transpose((0,1))
-        # mean = np.array([x/255.0 for x in [125.3,123.0,113.9]])
-        # std = np.array([x/255.0 for x in [63.0,62.1,66.7]])
 
     inp = np.clip(inp,0,1)
     return inp
@@ -70,9 +54,7 @@ def save_image(real_cpu,receptive_feild,ncs,epoch_num,file_name):
 def convert_image_np_2d(inp):
     inp = denorm(inp)
     inp = inp.numpy()
-    # mean = np.array([x/255.0 for x in [125.3,123.0,113.9]])
-    # std = np.array([x/255.0 for x in [63.0,62.1,66.7]])
-    # inp = std*
+
     return inp
 
 def generate_noise(size,num_samp=1,device='cuda',type='gaussian', scale=1):
