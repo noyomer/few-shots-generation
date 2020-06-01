@@ -14,7 +14,6 @@ from skimage.transform import resize, rescale
 import os
 import random
 from sklearn.cluster import KMeans
-import shutil
 
 
 # custom weights initialization called on netG and netD
@@ -148,6 +147,18 @@ def resize_images(imgs, heights, widths):
         resized_imgs.append(image_resized)
     return (False, resized_imgs)
 
+def update_input_dir(dir, imgs, opt):
+    try:
+        if not os.path.exists(dir):
+            os.makedirs(dir)
+        else:
+            os.rename(dir, 'Input/Images/old_version_inputs_%s' % opt.model_name)
+            os.makedirs(dir)
+    except OSError:
+        pass
+    for i in range(len(imgs)):
+        img.imsave('%s/%d.png' % (dir, i), imgs[i])
+
 
 def read_images(opt):
     dir = opt.input_dir
@@ -166,21 +177,10 @@ def read_images(opt):
 
     equal_size, imgs = resize_images(imgs, heights, widths)
     if not equal_size:
-        path_resize = 'Input/Images/final_input_%s' % opt.model_name
-        try:
-            if not os.path.exists(path_resize):
-                os.makedirs(path_resize)
-            else:
-                shutil.rmtree(path_resize)  # Removes all the subdirectories
-                os.makedirs(path_resize)
-        except OSError:
-            pass
-
-        for i in range(len(imgs)):
-            img.imsave('%s/%d.png' %  (path_resize, i), imgs[i])
-
-        for input_name in os.listdir(path_resize):
-            img_in = img.imread('%s/%s' % (path_resize, input_name))
+        update_input_dir(dir, imgs, opt)
+        for input_name in os.listdir(dir):
+            img_in = img.imread('%s/%s' % (dir, input_name))
+            h, w, c = img_in.shape
             if img_in is not None:
                 if c == 4:
                     img_in = img_in[:, :, 0:3]
