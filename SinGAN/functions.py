@@ -14,6 +14,7 @@ from skimage.transform import resize, rescale
 import os
 import random
 from sklearn.cluster import KMeans
+import shutil
 
 
 # custom weights initialization called on netG and netD
@@ -137,7 +138,7 @@ def compare_image_sizes(heights, widths):
 
 def resize_images(imgs, heights, widths):
     if compare_image_sizes(heights, widths):
-        return imgs # all images are of the same size
+        return (True, imgs) # all images are of the same size
 
     h_min = min(heights)
     w_min = min(widths)
@@ -145,7 +146,7 @@ def resize_images(imgs, heights, widths):
     for image in imgs:
         image_resized = resize(image, (h_min, w_min), anti_aliasing=True)
         resized_imgs.append(image_resized)
-    return resized_imgs
+    return (False, resized_imgs)
 
 
 def read_images(opt):
@@ -163,9 +164,28 @@ def read_images(opt):
             heights.append(h)
             widths.append(w)
 
-    imgs = resize_images(imgs, heights, widths)
-    for i in range(len(imgs)):
-        img.imsave('final_input_%d.png' %  i, imgs[i])
+    equal_size, imgs = resize_images(imgs, heights, widths)
+    if not equal_size:
+        path_resize = 'Input/Images/final_input_%s' % opt.model_name
+        try:
+            if not os.path.exists(path_resize):
+                os.makedirs(path_resize)
+            else:
+                shutil.rmtree(path_resize)  # Removes all the subdirectories
+                os.makedirs(path_resize)
+        except OSError:
+            pass
+
+        for i in range(len(imgs)):
+            img.imsave('%s/%d.png' %  (path_resize, i), imgs[i])
+
+        for input_name in os.listdir(path_resize):
+            img_in = img.imread('%s/%s' % (path_resize, input_name))
+            if img_in is not None:
+                if c == 4:
+                    img_in = img_in[:, :, 0:3]
+                imgs.append(img_in)
+                
     imgs = np.array(imgs)
     x = np2torch(imgs, opt)
     x = x[:,0:3,:,:]
